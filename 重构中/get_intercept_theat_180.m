@@ -1,0 +1,39 @@
+function F=get_intercept_theat_180(A,B,H,vp,z)
+    cof=4/(3*sqrt(B));
+    i=1;
+    cmin=H+tan(z)*sqrt(H/A);%左上交点
+    cmax=H-tan(z)*sqrt(H/A);%右上交点
+    c=double((cmin+cmax)/2);
+    while(i<100)
+        d=tan(z)^2+4*A*c;
+        xmin=-sqrt(H/A);
+        xL=(H-c)/tan(z);
+        xR=(tan(z)+sqrt(d))/(2*A);
+        xmax=sqrt(H/A);
+        fun1=@(x) (tan(z)*x+c-A*x.^2).^1.5;
+        v1=quadv(fun1,xL,xR);
+        v1=v1*cof;%水上右
+        fun2=@(x) (H-A*x.^2).^1.5;
+        v2=quadv(fun2,xmin,xL);
+        v2=v2*cof;%水上左
+        v=quadv(fun2,xmin,xmax);
+        v=v*cof;%总体积
+        volumn=v-v1-v2;
+    if(volumn<vp)%体积小，太高了
+       if(c<cmax)
+           cmax=c;
+       end
+    end
+    if(volumn>vp)%体积大，太低了
+        if(c>cmin)
+            cmin=c;
+        end
+    end
+    if(volumn==vp)
+        break;
+    end
+        c=double((cmin+cmax)/2);
+        i=i+1;
+    end
+    F=c;
+end

@@ -1,0 +1,30 @@
+%/*-----固定积分上下限-------*/
+%/*-----得到了角度以后的计算-*/
+%/*-----迭代求C-------------*/
+function F=get_intercept(A,B,H,V_boat,z)
+    syms x y;
+    c_min=0;
+    c_max=H-tan(z)*(H/A)^0.5;
+    c_center=(c_min+c_max)/2;
+    j=1;
+    while(j<100)
+        fun=@(x)(tan(z)*x+c_center-H/3-2*A*x^2/3)*(H-A*x^2)^0.5;
+        c_x1=(tan(z)-(tan(z)^2-4*A*(tan(z)*(H/A)^0.5-H))^0.5)/(2*A);
+        c_x2=(tan(z)+(tan(z)^2-4*A*(tan(z)*(H/A)^0.5-H))^0.5)/(2*A);
+        V_temp=quadv(fun,c_x1,c_x2);
+        V_temp=V_temp*2/B^0.5;
+        if(V_temp>V_boat)
+            if(c_center<c_max)
+                c_max=c_center;
+            end
+        end
+        if(V_temp<V_boat)
+            if(c_center>c_min)
+                c_min=c_center;
+            end
+        end
+        c_center=(c_min+c_max)/2;
+        j=j+1;
+    end
+    F=c_center;
+end
